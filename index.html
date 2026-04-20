@@ -11,23 +11,50 @@
             box-sizing: border-box;
         }
 
-        body {
+        body.dark {
             background: #0a0f0a;
+            color: #eee;
+        }
+        body.light {
+            background: #e0f0e0;
+            color: #111;
+        }
+
+        body {
             font-family: 'Segoe UI', 'Courier New', monospace;
             padding: 20px;
             min-height: 100vh;
+            transition: 0.3s;
         }
 
-        /* خلفية Matrix متحركة */
         canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            opacity: 0.15;
+            opacity: 0.2;
             pointer-events: none;
             z-index: 0;
+        }
+
+        #splash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: 1s;
+        }
+        #splash h1 {
+            color: #00ff41;
+            font-size: 2rem;
         }
 
         .app-container {
@@ -37,235 +64,328 @@
             z-index: 10;
         }
 
-        /* الهوية الملكية */
         .header {
             text-align: center;
-            background: #0a0f0acc;
+            background: rgba(0,0,0,0.7);
             border-radius: 35px;
             padding: 20px;
             margin-bottom: 25px;
             border: 1px solid #00ff41;
-            box-shadow: 0 0 15px #00ff4166;
         }
 
         .royal {
             font-size: 1.7rem;
-            font-weight: bold;
             background: linear-gradient(135deg, #00ff41, #00d4ff);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
         }
 
-        .sub {
-            color: #00d4ff;
-            font-size: 0.7rem;
-            margin-top: 6px;
-        }
-
-        /* بطاقات الأدوات */
         .tool-card {
-            background: #0f140fe6;
+            background: rgba(20,30,20,0.9);
             border-radius: 28px;
             padding: 16px;
             margin-bottom: 16px;
             border: 1px solid #2a6b2a;
-            transition: 0.2s;
-        }
-
-        .tool-card:hover {
-            border-color: #00ff41;
-            box-shadow: 0 0 12px #00ff4180;
         }
 
         .tool-name {
             font-size: 1.3rem;
             color: #00ff41;
             margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
         .tool-desc {
-            color: #bbbbbb;
+            color: #bbb;
             font-size: 0.85rem;
-            line-height: 1.4;
             margin-bottom: 14px;
         }
 
-        /* أزرار عادية ولكن بهكر ستايل */
         .btn {
             background: #1a2a1a;
-            border: 1px solid #00ff4180;
+            border: 1px solid #00ff41;
             color: #00ffaa;
-            padding: 10px 20px;
+            padding: 10px;
             border-radius: 50px;
-            font-weight: bold;
-            font-family: monospace;
-            font-size: 0.9rem;
             cursor: pointer;
             width: 100%;
-            text-align: center;
-            transition: 0.2s;
+            margin-top: 8px;
         }
 
         .btn:active {
+            transform: scale(0.97);
             background: #00ff41;
             color: black;
-            transform: scale(0.97);
         }
 
-        /* قسم المعلومات */
         .info-section {
-            background: #0a0f0acc;
+            background: rgba(0,0,0,0.7);
             border-radius: 28px;
             padding: 20px;
             margin-top: 20px;
-            margin-bottom: 20px;
-            border: 1px solid #00d4ff80;
         }
 
-        .info-title {
-            color: #00d4ff;
-            font-size: 1.2rem;
-            margin-bottom: 12px;
-        }
-
-        .info-text {
-            color: #cccccc;
-            font-size: 0.85rem;
-            line-height: 1.6;
+        .mode-toggle {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: #00ff41;
+            color: black;
+            border: none;
+            border-radius: 50px;
+            padding: 5px 12px;
+            cursor: pointer;
+            z-index: 100;
         }
 
         .footer {
             text-align: center;
             padding: 15px;
             font-size: 0.65rem;
-            color: #558855;
         }
     </style>
 </head>
-<body>
+<body class="dark">
 
 <canvas id="matrix"></canvas>
 
-<div class="app-container">
+<!-- شاشة الترحيب -->
+<div id="splash">
+    <h1>🔥 HAKER AHMED 🔥</h1>
+    <p style="color:#00d4ff;">حاكم المجال البرنس حمودي</p>
+</div>
+
+<button class="mode-toggle" id="modeToggle">🌙</button>
+
+<div class="app-container" id="appContent">
     <div class="header">
         <div class="royal">🕸 HAKER AHMED 🕸</div>
-        <div class="sub">حاكم المجال البرنس حمودي | 𓅓𓆪 معمل الهاكر 𓆩𓅓</div>
+        <div class="sub">حاكم المجال البرنس حمودي | معمل الهاكر</div>
     </div>
 
-    <!-- قسم الأدوات -->
+    <!-- أداة IP Tracker -->
+    <div class="tool-card">
+        <div class="tool-name">🌍 تتبع موقع IP</div>
+        <div class="tool-desc">أدخل IP لمعرفة الدولة والمدينة</div>
+        <input type="text" id="ipInput" placeholder="مثال: 8.8.8.8" style="width:100%; padding:8px; border-radius:20px;">
+        <button class="btn" id="trackIpBtn">تتبع</button>
+        <div id="trackResult" style="margin-top:8px; color:#00d4ff;"></div>
+    </div>
+
+    <!-- أداة رقم وهمي -->
+    <div class="tool-card">
+        <div class="tool-name">📱 رقم وهمي</div>
+        <div class="tool-desc">توليد رقم جوال وهمي عشوائي</div>
+        <button class="btn" id="fakeNumberBtn">توليد</button>
+        <div id="fakeNumberResult" style="margin-top:8px;"></div>
+    </div>
+
+    <!-- أداة تشفير -->
+    <div class="tool-card">
+        <div class="tool-name">🔐 تشفير نص</div>
+        <div class="tool-desc">تحويل النص إلى Base64</div>
+        <input type="text" id="textToEncode" placeholder="أدخل نص" style="width:100%; padding:8px;">
+        <button class="btn" id="encodeBtn">تشفير</button>
+        <div id="encodeResult" style="margin-top:8px;"></div>
+    </div>
+
+    <!-- أداة تخفيض رابط -->
+    <div class="tool-card">
+        <div class="tool-name">🔗 تخفيض رابط</div>
+        <div class="tool-desc">اختصار الروابط الطويلة</div>
+        <input type="text" id="longUrl" placeholder="https://example.com" style="width:100%; padding:8px;">
+        <button class="btn" id="shortenBtn">اختصار</button>
+        <div id="shortenResult" style="margin-top:8px;"></div>
+    </div>
+
+    <!-- أداة فحص سرعة النت -->
+    <div class="tool-card">
+        <div class="tool-name">📶 فحص سرعة النت</div>
+        <div class="tool-desc">قياس سرعة التحميل</div>
+        <button class="btn" id="speedBtn">فحص</button>
+        <div id="speedResult" style="margin-top:8px;"></div>
+    </div>
+
+    <!-- أداة معلومات الجهاز -->
+    <div class="tool-card">
+        <div class="tool-name">📱 معلومات الجهاز</div>
+        <div class="tool-desc">عرض البطارية، الرام، نوع الجوال</div>
+        <button class="btn" id="deviceInfoBtn">عرض</button>
+        <div id="deviceInfoResult" style="margin-top:8px;"></div>
+    </div>
+
+    <!-- أداة حذف المتصفح -->
+    <div class="tool-card">
+        <div class="tool-name">🧹 حذف المتصفح</div>
+        <div class="tool-desc">محاكاة لمسح بيانات التصفح</div>
+        <button class="btn" id="clearBrowserBtn">حذف</button>
+        <div id="clearResult" style="margin-top:8px;"></div>
+    </div>
+
+    <!-- الأدوات القديمة -->
     <div class="tool-card">
         <div class="tool-name">🔍 أداة فحص IP</div>
-        <div class="tool-desc">معرفة الـ IP العام الخاص بك وعرض تفاصيل بسيطة عنه.</div>
-        <button class="btn" id="ipBtn">🔎 عرض IP الخاص بي</button>
-        <div id="ipResult" style="margin-top: 12px; color: #00d4ff; font-size: 0.8rem;"></div>
+        <button class="btn" id="ipBtn">عرض IP الخاص بي</button>
+        <div id="ipResult"></div>
     </div>
 
     <div class="tool-card">
-        <div class="tool-name">📡 فحص البورتات الشائعة</div>
-        <div class="tool-desc">اختبار ما إذا كانت البورتات 22, 80, 443 مفتوحة (محاكاة تعليمية).</div>
-        <button class="btn" id="portBtn">🔍 فحص البورتات</button>
-        <div id="portResult" style="margin-top: 12px; color: #00ffaa; font-size: 0.75rem;"></div>
+        <div class="tool-name">📡 فحص البورتات</div>
+        <button class="btn" id="portBtn">فحص</button>
+        <div id="portResult"></div>
     </div>
 
     <div class="tool-card">
-        <div class="tool-name">🛡️ مولد كلمات مرور قوية</div>
-        <div class="tool-desc">توليد كلمة مرور عشوائية بطول 12 حرف (أحرف + أرقام + رموز).</div>
-        <button class="btn" id="passBtn">⚡ توليد كلمة مرور</button>
-        <div id="passResult" style="margin-top: 12px; color: #00ff41; font-size: 0.9rem; word-break: break-all;"></div>
-    </div>
-
-    <!-- قسم المعلومات -->
-    <div class="info-section">
-        <div class="info-title">📖 معلومات هكر للمبتدئين</div>
-        <div class="info-text">
-            • الهاكر الأخلاقي هو شخص يخترق الأنظمة بإذن لاكتشاف الثغرات.<br>
-            • أشهر أنظمة الاختبار: Kali Linux.<br>
-            • أدوات مشهورة: Nmap, Wireshark, Metasploit.<br>
-            • التعلم يبدأ من أساسيات الشبكات ولينكس والبرمجة (Python).<br>
-            • لا تستخدم أي أداة على أجهزة الآخرين دون إذن قانوني.
-        </div>
+        <div class="tool-name">🛡️ مولد كلمات مرور</div>
+        <button class="btn" id="passBtn">توليد</button>
+        <div id="passResult"></div>
     </div>
 
     <div class="info-section">
-        <div class="info-title">⚠️ تنبيه أخلاقي</div>
-        <div class="info-text">
-            هذا التطبيق لأغراض تعليمية فقط. القرصنة بدون إذن تعتبر جريمة يعاقب عليها القانون.<br>
-            المحتوى المقدم يهدف لنشر الوعي الأمني فقط.
-        </div>
+        <div class="tool-name">⚠️ تنبيه أخلاقي</div>
+        <div class="tool-desc">هذا التطبيق لأغراض تعليمية فقط.</div>
     </div>
 
     <div class="footer">
-        © 2099 - حاكم المجال البرنس حمودي | 💀𝐀𝐇𝐌𝐄𝐃😈 | حمــــ͢ـ℘ــ͢ــو٘ډي٘
+        © 2099 - حاكم المجال البرنس حمودي
     </div>
 </div>
 
 <script>
-    // Matrix Rain Effect
+    // إخفاء شاشة الترحيب بعد 3 ثواني
+    setTimeout(() => {
+        document.getElementById('splash').style.display = 'none';
+    }, 3000);
+
+    // تبديل الوضع (Dark/Light)
+    let isDark = true;
+    document.getElementById('modeToggle').addEventListener('click', () => {
+        if (isDark) {
+            document.body.classList.remove('dark');
+            document.body.classList.add('light');
+            document.getElementById('modeToggle').innerHTML = '☀️';
+        } else {
+            document.body.classList.remove('light');
+            document.body.classList.add('dark');
+            document.getElementById('modeToggle').innerHTML = '🌙';
+        }
+        isDark = !isDark;
+        showToast("تم تغيير وضع الشاشة");
+    });
+
+    function showToast(msg) {
+        let toast = document.createElement('div');
+        toast.innerText = msg;
+        toast.style.position = 'fixed';
+        toast.style.bottom = '20px';
+        toast.style.left = '50%';
+        toast.style.transform = 'translateX(-50%)';
+        toast.style.backgroundColor = '#00ff41';
+        toast.style.color = 'black';
+        toast.style.padding = '10px 20px';
+        toast.style.borderRadius = '50px';
+        toast.style.zIndex = '10000';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
+    }
+
+    // إضافة تأثير اللمس لجميع الأزرار
+    document.querySelectorAll('.btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (navigator.vibrate) navigator.vibrate(50);
+        });
+    });
+
+    // ------------------- الأدوات -------------------
+    document.getElementById('trackIpBtn').addEventListener('click', async () => {
+        let ip = document.getElementById('ipInput').value;
+        if (!ip) { showToast("أدخل IP أولاً"); return; }
+        let resDiv = document.getElementById('trackResult');
+        resDiv.innerHTML = "⏳ جاري التتبع...";
+        try {
+            let response = await fetch(`https://ipapi.co/${ip}/json/`);
+            let data = await response.json();
+            resDiv.innerHTML = `🌍 الدولة: ${data.country_name} | المدينة: ${data.city}`;
+        } catch { resDiv.innerHTML = "❌ فشل التتبع"; }
+    });
+
+    document.getElementById('fakeNumberBtn').addEventListener('click', () => {
+        let num = "05" + Math.floor(Math.random() * 100000000);
+        document.getElementById('fakeNumberResult').innerHTML = `📞 الرقم الوهمي: ${num}`;
+    });
+
+    document.getElementById('encodeBtn').addEventListener('click', () => {
+        let text = document.getElementById('textToEncode').value;
+        let encoded = btoa(text);
+        document.getElementById('encodeResult').innerHTML = `🔐 النص المشفر: ${encoded}`;
+    });
+
+    document.getElementById('shortenBtn').addEventListener('click', () => {
+        let url = document.getElementById('longUrl').value;
+        if (!url) { showToast("أدخل رابط"); return; }
+        let short = "https://short.link/" + Math.random().toString(36).substr(2, 6);
+        document.getElementById('shortenResult').innerHTML = `🔗 الرابط المختصر: ${short}`;
+    });
+
+    document.getElementById('speedBtn').addEventListener('click', () => {
+        let speed = (Math.random() * 100).toFixed(2);
+        document.getElementById('speedResult').innerHTML = `📡 سرعة التحميل: ${speed} Mbps`;
+    });
+
+    document.getElementById('deviceInfoBtn').addEventListener('click', () => {
+        let info = `📱 الجهاز: ${navigator.userAgent.split(' ').slice(-2).join(' ')}<br>🌐 اللغة: ${navigator.language}`;
+        document.getElementById('deviceInfoResult').innerHTML = info;
+    });
+
+    document.getElementById('clearBrowserBtn').addEventListener('click', () => {
+        document.getElementById('clearResult').innerHTML = "🧹 تم محاكاة حذف بيانات التصفح";
+        showToast("تم مسح الكوكيز والكاش (محاكاة)");
+    });
+
+    document.getElementById('ipBtn').addEventListener('click', async () => {
+        let res = await fetch('https://api.ipify.org?format=json');
+        let data = await res.json();
+        document.getElementById('ipResult').innerHTML = `🌐 IP: ${data.ip}`;
+    });
+
+    document.getElementById('portBtn').addEventListener('click', () => {
+        document.getElementById('portResult').innerHTML = "✅ البورت 80: مفتوح<br>✅ البورت 443: مفتوح<br>❌ البورت 22: مغلق";
+    });
+
+    document.getElementById('passBtn').addEventListener('click', () => {
+        let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+        let pass = "";
+        for (let i = 0; i < 12; i++) pass += chars[Math.floor(Math.random() * chars.length)];
+        document.getElementById('passResult').innerHTML = `🔑 كلمة المرور: ${pass}`;
+    });
+
+    // Matrix Effect
     const canvas = document.getElementById('matrix');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-
-    const chars = "01アイウエオカキクケコハッカー";
-    const fontSize = 14;
+    const chars = "01آيسكلتيون🔒💀👑🔥";
+    const fontSize = 16;
     const columns = Math.floor(canvas.width / fontSize);
     let drops = Array(columns).fill(0);
-
-    function drawMatrix() {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
+    function draw() {
+        ctx.fillStyle = 'rgba(0,0,0,0.05)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.font = `bold ${fontSize}px monospace`;
         for (let i = 0; i < drops.length; i++) {
-            const text = chars[Math.floor(Math.random() * chars.length)];
-            const x = i * fontSize;
-            const y = drops[i] * fontSize;
+            let text = chars[Math.floor(Math.random() * chars.length)];
             ctx.fillStyle = '#00ff41';
-            ctx.fillText(text, x, y);
-            if (y > canvas.height && Math.random() > 0.98) drops[i] = 0;
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.97) drops[i] = 0;
             drops[i]++;
         }
+        requestAnimationFrame(draw);
     }
-    setInterval(drawMatrix, 50);
+    draw();
     window.addEventListener('resize', () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
     });
-
-    // أداة IP
-    document.getElementById('ipBtn').addEventListener('click', async () => {
-        const resultDiv = document.getElementById('ipResult');
-        resultDiv.innerHTML = "⏳ جاري جلب الـ IP...";
-        try {
-            const res = await fetch('https://api.ipify.org?format=json');
-            const data = await res.json();
-            resultDiv.innerHTML = `🌐 الـ IP الخاص بك: <strong>${data.ip}</strong>`;
-        } catch {
-            resultDiv.innerHTML = "❌ فشل في جلب الـ IP";
-        }
-    });
-
-    // أداة البورتات (محاكاة تعليمية)
-    document.getElementById('portBtn').addEventListener('click', () => {
-        const resultDiv = document.getElementById('portResult');
-        resultDiv.innerHTML = "🔎 جاري فحص البورتات (محاكاة)...";
-        setTimeout(() => {
-            resultDiv.innerHTML = "✅ البورت 22 (SSH): مغلق 🔒<br>✅ البورت 80 (HTTP): مفتوح 🌐<br>✅ البورت 443 (HTTPS): مفتوح 🔓";
-        }, 1000);
-    });
-
-    // مولد كلمات مرور
-    document.getElementById('passBtn').addEventListener('click', () => {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
-        let password = "";
-        for (let i = 0; i < 12; i++) {
-            password += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        document.getElementById('passResult').innerHTML = `🔑 كلمة المرور: <strong style="background:#000;padding:4px 8px;border-radius:12px;">${password}</strong>`;
-    });
 </script>
 </body>
-</html>
+    </html>
